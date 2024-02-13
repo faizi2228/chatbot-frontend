@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatbot</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    .chat-container {
+        width: 300px;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .chat-area {
+        height: 300px;
+        overflow-y: scroll;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    .message {
+        margin-bottom: 10px;
+    }
+    .user-message {
+        text-align: right;
+        color: blue;
+    }
+    .bot-message {
+        text-align: left;
+        color: green;
+    }
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-area" id="chat-area"></div>
+    <input type="text" id="user-input" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+function sendMessage() {
+    var userInput = document.getElementById("user-input").value;
+    appendMessage("You: " + userInput, "user-message");
+
+    // Send user input to the server
+    fetch('/chatbot', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: userInput }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        appendMessage("Pippit: " + data.response, "bot-message");
+    });
+
+    // Clear the input field after sending the message
+    document.getElementById("user-input").value = "";
+}
+
+function appendMessage(message, className) {
+    var chatArea = document.getElementById("chat-area");
+    var messageElement = document.createElement("div");
+    messageElement.textContent = message;
+    messageElement.classList.add("message");
+    messageElement.classList.add(className);
+    chatArea.appendChild(messageElement);
+
+    // Scroll to the bottom of the chat area to show the latest message
+    chatArea.scrollTop = chatArea.scrollHeight;
+}
+</script>
+
+</body>
+</html>
